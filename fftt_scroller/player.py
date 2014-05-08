@@ -42,8 +42,6 @@ class PlayerPage:
       html_node = self.root.xpath('(/html/body/div)[3]//td[4]')[0]
       return float(html_node.text)
 
-
-
    
 class PlayersListPage:
 
@@ -66,6 +64,38 @@ class PlayersListPage:
         next_url = '{}/{}'.format(base, node.attrib['href'])
         return PlayersListPage(next_url)
         
+
+
+    def __getitem__(self, index):
+        xpath = '/html/body/center[2]//tr[{}]/td[1]/font/a'.format(index + 2)
+        print (index, node)
+        node = self.root.xpath(xpath)[0]
+
+        base, _ = self.url.rsplit('/', 1)
+        next_url = '{}/{}'.format(base, node.attrib['href'])
+        return PlayerPage(next_url)        
+
+
+
+    def __iter__(self):
+        count = 0
+        page = self
+
+        while True:
+            try:
+                yield page[count]
+            except IndexError:
+                try:
+                    page = page.next()
+                except NoNextPageFound:
+                    count = 0
+                    return
+                else:
+                    count = 0
+            else:
+                count += 1
+
+            
             
 
 
