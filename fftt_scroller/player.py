@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+from time import sleep
 from lxml import html 
 
 from fftt_scroller.pages import format_get_data
@@ -22,7 +23,7 @@ class PlayerPage:
   @property
   def ranking(self):
       html_node = self.root.xpath('/html/body/dd/div[2]//tr[5]/td[2]')[0]
-      return int(html_node.text)
+      return html_node.text
 
 
   @property
@@ -40,7 +41,14 @@ class PlayerPage:
   @property
   def mounthly_progression(self):
       html_node = self.root.xpath('(/html/body/div)[3]//td[4]')[0]
-      return float(html_node.text)
+
+      try:
+          font = html_node.findall('font')[0]
+      except IndexError:
+          return float(html_node.text)
+
+      return float(font.text)
+
 
    
 class PlayersListPage:
@@ -68,7 +76,6 @@ class PlayersListPage:
 
     def __getitem__(self, index):
         xpath = '/html/body/center[2]//tr[{}]/td[1]/font/a'.format(index + 2)
-        print (index, node)
         node = self.root.xpath(xpath)[0]
 
         base, _ = self.url.rsplit('/', 1)
@@ -83,6 +90,7 @@ class PlayersListPage:
 
         while True:
             try:
+                sleep(5)
                 yield page[count]
             except IndexError:
                 try:
